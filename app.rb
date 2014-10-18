@@ -13,25 +13,48 @@ GITHUB_OAUTH_ACCESS_TOKEN  = ENV.fetch('GITHUB_OAUTH_ACCESS_TOKEN', nil)
 GITHUB_API_ENDPOINT        = ENV.fetch('GITHUB_API_ENDPOINT', nil)
 
 class Issue
-  extend Forwardable
-
   STATE_COLORS = {
     'open'   => '6CC644',
     'merged' => '6E5494',
     'closed' => 'BD2C00',
   }
 
-  def initialize(octokit_issue, pr_merged)
-    @issue = octokit_issue
+  def initialize(octokit, repo, number)
+    @issue = octokit.issue(repo, number)
+
+    pr_merged = @issue.state == 'closed' and
+                @issue.pull_request and
+                octokit.pull_merged?(repo, number)
     @state = pr_merged ? 'merged' : @issue.state
   end
 
-  attr_reader :state
-
+  extend Forwardable
   def_delegators :@issue, :labels, :assignee, :user, :number
+
+  attr_reader :state
 
   def state_color
     STATE_COLORS[state]
+  end
+
+  def assignee_avatar_url
+    avatar_data_url(@issue.assignee)
+  end
+
+  def user_avatar_url
+    avatar_data_url(@issue.user)
+  end
+
+  private
+
+  def avatar_data_url(user)
+    return unless user and user.avatar_url
+
+    url = URI(user.avatar_url)
+    url.query = url.query ? "#{url.query}&s=20" : 's=20'
+
+    res = HTTParty.get(url)
+    "data:#{res.content_type};base64,#{Base64.strict_encode64(res.to_s)}"
   end
 end
 
@@ -71,21 +94,10 @@ get '/badge/:owner/:repo/:number' do
   end
 
   issue = begin
-    repo = { owner: params[:owner], repo: params[:repo] }
-    number = params[:number]
-    octokit_issue = client.issue(repo, number)
-    pr_merged = octokit_issue.state == 'closed' and
-                octokit_issue.pull_request and
-                client.pull_merged?(repo, number)
-
-    Issue.new(octokit_issue, pr_merged)
+    Issue.new(client, { owner: params[:owner], repo: params[:repo] }, params[:number])
   rescue Octokit::NotFound
     halt_badge_message 404, 'Not Found'
   end
-
-  avatar_url = (issue.assignee || issue.user).avatar_url
-  res = HTTParty.get(avatar_url)
-  avatar_url = 'data:' + res.content_type + ';base64,' + Base64.strict_encode64(res.to_s)
 
   # not so correct :P
   number_width = 15 + issue.number.to_s.length * 9
@@ -102,6 +114,5 @@ get '/badge/:owner/:repo/:number' do
     icon_size:    BADGE_HEIGHT,
     label_width:  LABEL_WIDTH,
     issue:        issue,
-    avatar_url:   avatar_url,
   }
 end
