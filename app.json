@@ -1,0 +1,35 @@
+{
+  "name": "Github Issue Badge",
+  "description": "Shows GitHub issues' information in simple badges",
+  "website": "http://github-issue-badge.herokuapp.com/",
+  "repository": "https://github.com/motemen/github-issue-badge",
+  "keywords": [
+    "GitHub",
+    "badge",
+    "issue",
+    "pull request"
+  ],
+  "addons": [
+    "redistogo:nano"
+  ],
+  "env": {
+    "GITHUB_OAUTH_CLIENT_ID": {
+      "description": "GitHub application's OAuth client ID. ref: <https://developer.github.com/v3/oauth/>"
+    },
+    "GITHUB_OAUTH_CLIENT_SECRET": {
+      "description": "GitHub application's OAuth client secret. ref: <https://developer.github.com/v3/oauth/>"
+    },
+    "GITHUB_OAUTH_ACCESS_TOKEN": {
+      "description": "GitHub OAuth private access token; Setting this permits showing badges without user authorizing",
+      "required": false
+    },
+    "GITHUB_API_ENDPOINT": {
+      "description": "GitHub API's endpoint URL. Specify if you want to show badges for GitHub:Enterprise. eg. 'https://ghe.example.com/api/v3/'",
+      "required": false
+    },
+    "REDIS_URL": {
+      "description": "Redis server URL. You won't need this if you are using Heroku. eg. 'redis://localhost:6379'",
+      "required": false
+    }
+  }
+}
