@@ -3,8 +3,9 @@ source 'https://rubygems.org'
 gem 'sinatra'
 gem 'slim'
 gem 'octokit'
-gem 'httparty'
 gem 'redis-rack'
+gem 'faraday'
+gem 'faraday_middleware'
 
 group :developmet do
   gem 'shotgun'

@@ -1,7 +1,9 @@
 require 'octokit'
 require 'sinatra'
 require 'slim'
-require 'httparty'
+require 'faraday'
+require 'faraday_middleware'
+require 'logger'
 
 BADGE_HEIGHT = 20
 LABEL_WIDTH  =  8
@@ -11,6 +13,15 @@ GITHUB_OAUTH_CLIENT_ID     = ENV.fetch('GITHUB_OAUTH_CLIENT_ID')
 GITHUB_OAUTH_CLIENT_SECRET = ENV.fetch('GITHUB_OAUTH_CLIENT_SECRET')
 GITHUB_OAUTH_ACCESS_TOKEN  = ENV.fetch('GITHUB_OAUTH_ACCESS_TOKEN', nil)
 GITHUB_API_ENDPOINT        = ENV.fetch('GITHUB_API_ENDPOINT', nil)
+
+def conn
+  Faraday.new do |conn|
+    conn.request  :json
+    conn.response :json, content_type: /\bjson$/
+    conn.response :logger, Logger.new(STDERR).tap { |logger| logger.level = Logger::INFO }
+    conn.adapter  Faraday.default_adapter
+  end
+end
 
 class Issue
   STATE_COLORS = {
@@ -53,8 +64,8 @@ class Issue
     url = URI(user.avatar_url)
     url.query = url.query ? "#{url.query}&s=20" : 's=20'
 
-    res = HTTParty.get(url)
-    "data:#{res.content_type};base64,#{Base64.strict_encode64(res.to_s)}"
+    resp = conn.get(url)
+    "data:#{resp.headers['Content-Type']};base64,#{Base64.strict_encode64(resp.body)}"
   end
 end
 
@@ -72,12 +83,17 @@ end
 
 get '/auth/callback' do
   code = params[:code] or halt_badge_message 400, 'Bad Request'
-  res = HTTParty.post(
+  resp = conn.post(
     'https://github.com/login/oauth/access_token',
-    headers: { 'Accept' => 'application/json' },
-    body: { 'client_id' => GITHUB_OAUTH_CLIENT_ID, 'client_secret' => GITHUB_OAUTH_CLIENT_SECRET, 'code' => code }
+    { 'client_id' => GITHUB_OAUTH_CLIENT_ID, 'client_secret' => GITHUB_OAUTH_CLIENT_SECRET, 'code' => code },
+    { 'Accept' => 'application/json' }
   )
-  session[:access_token] = res['access_token']
+  if not resp.success? or resp.body['error']
+    logger.error resp.body['error']
+    halt_badge_message 500, 'Auth failed'
+  end
+
+  session[:access_token] = resp.body['access_token']
 
   badge_message 200, 'Authorized'
 end
