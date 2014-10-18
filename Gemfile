@@ -1,10 +1,10 @@
 source 'https://rubygems.org'
 
-gem 'octokit'
 gem 'sinatra'
-gem 'slim'
-gem 'httparty'
 gem 'rack-session-redis'
+gem 'slim'
+gem 'octokit'
+gem 'httparty'
 
 group :developmet do
   gem 'shotgun'

@@ -3,7 +3,7 @@ svg width=badge_width height=badge_height xmlns="http://www.w3.org/2000/svg" xml
   rect x="0" y="0" width=badge_width height=badge_height style="fill:#555"
   rect x=number_width y="0" width=state_width height=badge_height style="fill:##{issue.state_color}"
   rect x=number_width+state_width y="0" width=badge_width height=badge_height style="fill:#999"
-  image x=number_width+state_width y="0" width=icon_size height=icon_size xlink:href=(issue.assignee || issue.user).avatar_url
+  image x=number_width+state_width y="0" width=icon_size height=icon_size xlink:href=avatar_url
   - issue.labels.each_with_index do |label,i|
     rect x=number_width+state_width+icon_size+label_width*i y="0" width=label_width height=badge_height style="fill:##{label.color}; fill-opacity: 0.9"
   linearGradient id="cover" x1="0%" y1="0%" x2="0%" y2="100%"

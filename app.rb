@@ -83,6 +83,10 @@ get '/badge/:owner/:repo/:number' do
     halt_badge_message 404, 'Not Found'
   end
 
+  avatar_url = (issue.assignee || issue.user).avatar_url
+  res = HTTParty.get(avatar_url)
+  avatar_url = 'data:' + res.content_type + ';base64,' + Base64.strict_encode64(res.to_s)
+
   # not so correct :P
   number_width = 15 + issue.number.to_s.length * 9
   state_width  = 10 + issue.state.length * 7
@@ -98,5 +102,6 @@ get '/badge/:owner/:repo/:number' do
     icon_size:    BADGE_HEIGHT,
     label_width:  LABEL_WIDTH,
     issue:        issue,
+    avatar_url:   avatar_url,
   }
 end
