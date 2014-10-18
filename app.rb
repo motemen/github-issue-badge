@@ -9,6 +9,8 @@ ICON_SIZE    = BADGE_HEIGHT
 
 GITHUB_OAUTH_CLIENT_ID     = ENV.fetch('GITHUB_OAUTH_CLIENT_ID')
 GITHUB_OAUTH_CLIENT_SECRET = ENV.fetch('GITHUB_OAUTH_CLIENT_SECRET')
+GITHUB_OAUTH_ACCESS_TOKEN  = ENV.fetch('GITHUB_OAUTH_ACCESS_TOKEN', nil)
+GITHUB_API_ENDPOINT        = ENV.fetch('GITHUB_API_ENDPOINT', nil)
 
 class Issue
   extend Forwardable
@@ -19,27 +21,18 @@ class Issue
     'closed' => 'BD2C00',
   }
 
-  def self.fetch(client, repo, number)
-    issue = client.issue(repo, number)
-    pr_merged = issue.state == 'closed' && issue.pull_request && client.pull_merged?(repo, number)
-
-    self.new(issue, pr_merged)
-  end
-
   def initialize(octokit_issue, pr_merged)
     @issue = octokit_issue
-    @pr_merged = pr_merged
+    @state = pr_merged ? 'merged' : @issue.state
   end
 
-  def state
-    @pr_merged ? 'merged' : @issue.state
-  end
+  attr_reader :state
+
+  def_delegators :@issue, :labels, :assignee, :user, :number
 
   def state_color
     STATE_COLORS[state]
   end
-
-  def_delegators :@issue, :labels, :assignee, :user, :number
 end
 
 def badge_message (status, message)
@@ -67,10 +60,25 @@ get '/auth/callback' do
 end
 
 get '/badge/:owner/:repo/:number' do
-  client = Octokit::Client.new(access_token: session[:access_token])
+  access_token = session[:access_token] || GITHUB_OAUTH_ACCESS_TOKEN
+  unless access_token
+    halt_badge_message 403, 'Visit /auth'
+  end
+
+  client = Octokit::Client.new(access_token: access_token)
+  if GITHUB_API_ENDPOINT
+    client.api_endpoint = GITHUB_API_ENDPOINT
+  end
 
   issue = begin
-    Issue.fetch(client, { owner: params[:owner], repo: params[:repo] }, params[:number])
+    repo = { owner: params[:owner], repo: params[:repo] }
+    number = params[:number]
+    octokit_issue = client.issue(repo, number)
+    pr_merged = octokit_issue.state == 'closed' and
+                octokit_issue.pull_request and
+                client.pull_merged?(repo, number)
+
+    Issue.new(octokit_issue, pr_merged)
   rescue Octokit::NotFound
     halt_badge_message 404, 'Not Found'
   end
