@@ -1,0 +1,12 @@
+web:
+  build: .
+  links:
+    - redis
+  ports:
+    - '3000:3000'
+  environment:
+    - REDIS_URL=redis://redis:6379
+    - GITHUB_OAUTH_CLIENT_ID
+    - GITHUB_OAUTH_CLIENT_SECRET
+redis:
+  image: redis
