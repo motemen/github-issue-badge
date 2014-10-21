@@ -5,14 +5,22 @@ require 'faraday'
 require 'faraday_middleware'
 require 'logger'
 
+## Configuration
+
+GITHUB_OAUTH_CLIENT_ID     = ENV['GITHUB_OAUTH_CLIENT_ID']
+GITHUB_OAUTH_CLIENT_SECRET = ENV['GITHUB_OAUTH_CLIENT_SECRET']
+GITHUB_OAUTH_ACCESS_TOKEN  = ENV['GITHUB_OAUTH_ACCESS_TOKEN']
+GITHUB_API_ENDPOINT        = ENV['GITHUB_API_ENDPOINT']
+
+unless (GITHUB_OAUTH_CLIENT_ID && GITHUB_OAUTH_CLIENT_SECRET) || GITHUB_OAUTH_ACCESS_TOKEN
+  raise 'You should specify either GITHUB_OAUTH_CLIENT_ID, GITHUB_OAUTH_CLIENT_SECRET pair or GITHUB_OAUTH_ACCESS_TOKEN'
+end
+
+## Dimensions
+
 BADGE_HEIGHT = 20
 LABEL_WIDTH  =  8
 ICON_SIZE    = BADGE_HEIGHT
-
-GITHUB_OAUTH_CLIENT_ID     = ENV.fetch('GITHUB_OAUTH_CLIENT_ID')
-GITHUB_OAUTH_CLIENT_SECRET = ENV.fetch('GITHUB_OAUTH_CLIENT_SECRET')
-GITHUB_OAUTH_ACCESS_TOKEN  = ENV.fetch('GITHUB_OAUTH_ACCESS_TOKEN', nil)
-GITHUB_API_ENDPOINT        = ENV.fetch('GITHUB_API_ENDPOINT', nil)
 
 def conn
   Faraday.new do |conn|
@@ -78,10 +86,14 @@ def halt_badge_message (status, message)
 end
 
 get '/auth' do
+  halt 404 unless GITHUB_OAUTH_CLIENT_ID && GITHUB_OAUTH_CLIENT_SECRET
+
   redirect "https://github.com/login/oauth/authorize?client_id=#{GITHUB_OAUTH_CLIENT_ID}&scope=repo"
 end
 
 get '/auth/callback' do
+  halt 404 unless GITHUB_OAUTH_CLIENT_ID && GITHUB_OAUTH_CLIENT_SECRET
+
   code = params[:code] or halt_badge_message 400, 'Bad Request'
   resp = conn.post(
     'https://github.com/login/oauth/access_token',

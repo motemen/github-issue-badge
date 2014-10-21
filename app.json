@@ -14,10 +14,12 @@
   ],
   "env": {
     "GITHUB_OAUTH_CLIENT_ID": {
-      "description": "GitHub application's OAuth client ID. ref: <https://developer.github.com/v3/oauth/>"
+      "description": "GitHub application's OAuth client ID. ref: <https://developer.github.com/v3/oauth/>",
+      "required": false
     },
     "GITHUB_OAUTH_CLIENT_SECRET": {
-      "description": "GitHub application's OAuth client secret. ref: <https://developer.github.com/v3/oauth/>"
+      "description": "GitHub application's OAuth client secret. ref: <https://developer.github.com/v3/oauth/>",
+      "required": false
     },
     "GITHUB_OAUTH_ACCESS_TOKEN": {
       "description": "GitHub OAuth private access token; Setting this permits showing badges without user authorizing",
