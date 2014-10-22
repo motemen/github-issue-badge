@@ -8,5 +8,7 @@ web:
     - REDIS_URL=redis://redis:6379
     - GITHUB_OAUTH_CLIENT_ID
     - GITHUB_OAUTH_CLIENT_SECRET
+    - GITHUB_OAUTH_ACCESS_TOKEN
+    - GITHUB_API_ENDPOINT
 redis:
   image: redis
