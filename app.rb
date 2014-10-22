@@ -88,7 +88,13 @@ end
 get '/auth' do
   halt 404 unless GITHUB_OAUTH_CLIENT_ID && GITHUB_OAUTH_CLIENT_SECRET
 
-  redirect "https://github.com/login/oauth/authorize?client_id=#{GITHUB_OAUTH_CLIENT_ID}&scope=repo"
+  scope = if params[:only] == 'public'
+    'public_repo'
+  else
+    'repo'
+  end
+
+  redirect "https://github.com/login/oauth/authorize?client_id=#{GITHUB_OAUTH_CLIENT_ID}&scope=#{scope}"
 end
 
 get '/auth/callback' do
