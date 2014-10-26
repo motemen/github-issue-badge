@@ -1,0 +1,41 @@
+@charset "utf-8";
+
+body {
+  margin: 5% 20%;
+  width: 50%;
+  font-family: "Lucida Grande", "Helvetica Neue", sans-serif;
+  font-size: 110%;
+  line-height: 1.5;
+  color: #333;
+}
+
+h1 {
+  font-family: "Lobster", inherit;
+  font-size: 72px;
+}
+
+h2 {
+  font-family: Montserrat, sans-serif;
+  font-size: 32px;
+  margin-top: 1.8em;
+  border-bottom: 1px solid #999;
+  color: #555;
+}
+
+h3 {
+  margin-top: 2em;
+}
+
+code {
+  background-color: #F3F3F3;
+  padding: 0 0.4em;
+}
+
+#content img {
+  box-shadow: 3px 3px 10px #999;
+  vertical-align: middle;
+}
+
+#content a img {
+  box-shadow: none;
+}
