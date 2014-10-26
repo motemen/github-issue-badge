@@ -1,10 +1,8 @@
 # GitHub Issue Badge
 
-http://github-issue-badge.herokuapp.com/
-
 GitHub issue/Pull Request information in embeddable images.
 
-![Badge](docs/badge-4x.png)
+![Badge](https://raw.githubusercontent.com/motemen/github-issue-badge/master/docs/badge-4x.png)
 
 - Issue#
 - Status (open/closed/merged)
@@ -14,14 +12,14 @@ GitHub issue/Pull Request information in embeddable images.
 ## Usage
 
 - Visit [/auth](http://github-issue-badge.herokuapp.com/auth) to authorize application.
-  - If you dislike `repo` scope, visit [/auth?only=public](http://github-issue-badge.herokuapp.com/auth?only=public) to allow `public_repo` scope only.
+  - If you don't like the `repo` scope, visit [/auth?only=public](http://github-issue-badge.herokuapp.com/auth?only=public) to allow `public_repo` scope only.
 - Visit `/badge/:user/:repo/:number` to get the badge.
   - eg. http://github-issue-badge.herokuapp.com/badge/motemen/test-repository/5
 
 ## Deploy your own
 
-- [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://www.heroku.com/deploy/?template=https://github.com/motemen/github-issue-badge)
-- or: `fig up`
+- Deploy to Heroku: [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://www.heroku.com/deploy/?template=https://github.com/motemen/github-issue-badge)
+- or use [Fig](http://www.fig.sh/): `fig up`
 - or: set up Redis and run the Rack app
 
 ## Environment variables
@@ -44,4 +42,8 @@ You don't need to set this variable if you run this app on Heroku or by fig.
 
 ## Chrome extension
 
-https://github.com/motemen/chrome-Embed-GitHub-Issue-Badges
+[chrome-Embed-GitHub-Issue-Badges](https://github.com/motemen/chrome-Embed-GitHub-Issue-Badges) substitutes issue links on GitHub to badges.
+
+## Author
+
+motemen <http://motemen.github.io/>
