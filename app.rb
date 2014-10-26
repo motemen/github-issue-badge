@@ -85,6 +85,10 @@ def halt_badge_message (status, message)
   halt status, badge_message(status, message)
 end
 
+get '/' do
+  redirect 'http://motemen.github.io/github-issue-badge/'
+end
+
 get '/auth' do
   halt 404 unless GITHUB_OAUTH_CLIENT_ID && GITHUB_OAUTH_CLIENT_SECRET
 
