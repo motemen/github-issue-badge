@@ -6,12 +6,11 @@ body {
   font-family: "Lucida Grande", "Helvetica Neue", sans-serif;
   font-size: 110%;
   line-height: 1.5;
-  color: #FFF;
-  background-color: #444;
+  color: #333;
 }
 
 h1 {
-  font-family: "Lobster", inherit;
+  font-family: "Lobster", sans-serif;
   font-size: 72px;
 }
 
@@ -20,6 +19,7 @@ h2 {
   font-size: 32px;
   margin-top: 1.8em;
   border-bottom: 1px solid #999;
+  color: #555;
 }
 
 h3 {
